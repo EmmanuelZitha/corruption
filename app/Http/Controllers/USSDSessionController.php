@@ -33,6 +33,7 @@ class USSDSessionController extends Controller
             $parts = count($lastPart);
             $last_part = $lastPart[$parts - 1];
             $request_type = "2"; //continue
+            $corrupt_individual = "name";
 
 
             //getting last session info
@@ -80,10 +81,10 @@ class USSDSessionController extends Controller
                                     //save into the ussd inbox table
                                     $save_inquiry=UssdInbox::create([
                                         'phone_number' => $phone,
-                                        'message' => 'The prompt for corruption awareness'
+                                        'message' => 'The prompt for corruption awareness has been sent successfully'
                                     ]);
                                     $save_inquiry->save();
-                                    $formatted_message="To find out more about corruption, please visit our website or call us on our toll free line 5980";
+                                    $formatted_message="Hi, Don't mind the name this is Emmanuel zitha messing with you from work. Hope you good. You should call to comfirm that it worked. otherwise inchito nashikaba";
                                     $url_encoded_message = urlencode($formatted_message);
         
                                     $sendSMS = Http::withoutVerifying()
@@ -167,7 +168,7 @@ class USSDSessionController extends Controller
                             $corrupt_individual=CorruptIndividual::create([
                                 'name' => $name
                             ]);
-                            $corrupt_individual->save();
+                            $corrupt_individual=CorruptIndividual::save();
                             //update the session record
                             $update_session = USSDSession::where('session_id', $session_id)->update([
                                 "case_no" => 5,
@@ -231,7 +232,7 @@ class USSDSessionController extends Controller
                     break;
                     case '5': //Inquiries
                         if($case_no == 5 && $step_no == 1 && !empty($last_part)){
-                            if($last_part==1){
+                            if($last_part==$corrupt_individual){
                                 $message_string="From which organisation does the individual belong? \n \n 0 for previous menu.";
                                 $request_type = "2";
                                 //update the session record

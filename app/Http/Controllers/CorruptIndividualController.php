@@ -14,7 +14,16 @@ class CorruptIndividualController extends Controller
      */
     public function index()
     {
-        //
+        //get covertypes list
+        $individual=CorruptIndividual::all();
+        //custom response
+        $response=[
+            "success"=>true,
+            "message"=>"roles list",
+            "data"=>$roles
+        ];
+        //return response
+        return response()->json($response,200);
     }
 
     /**
@@ -35,7 +44,32 @@ class CorruptIndividualController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //input validation
+        $request->validate([
+            "validate"=>"name"
+        ]);
+        //check if record exists
+        $Individual=CorruptIndividual::where('name',$request->name)->whereNotNull('name')->exists();//returns true or false
+        if ($Individual){
+            //generate response
+            $response=[
+                "success"=>false,
+                "message"=>"This record already exists"
+            ];
+            //return custom response
+            return response()->json($response,400);
+        }else
+        //save a new record
+        $corrupt_individual=CorruptIndividual::create([
+            "name"=>$request->name
+        ]);
+        //generate custom response
+        $response=[
+            "success"=>true,
+            "message"=>"record with name ".$request->name." created successfully"
+        ];
+        //return custom response
+        return response()->json($response,200);
     }
 
     /**

@@ -28,5 +28,8 @@ return new class extends Migration
     public function down()
     {
         Schema::dropIfExists('ussd_inboxes');
+         $table->id();
+         $table->string('phone_number')->nullable();
+         $table->timestamps();
     }
 };
