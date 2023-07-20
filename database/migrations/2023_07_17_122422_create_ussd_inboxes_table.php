@@ -30,6 +30,7 @@ return new class extends Migration
         Schema::dropIfExists('ussd_inboxes');
          $table->id();
          $table->string('phone_number')->nullable();
+         $table->string('corrupt_individual');
          $table->timestamps();
     }
 };

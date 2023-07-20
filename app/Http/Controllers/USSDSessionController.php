@@ -33,7 +33,6 @@ class USSDSessionController extends Controller
             $parts = count($lastPart);
             $last_part = $lastPart[$parts - 1];
             $request_type = "2"; //continue
-            $corrupt_individual = "name";
 
 
             //getting last session info
@@ -56,7 +55,7 @@ class USSDSessionController extends Controller
 
             }
             if($case_no==0 && $step_no==1){
-                $message_string="Welcome to ACC. Choose an option:\n 1. Report corruption \n 2. Corruption Awareness \n 3. Request call back \n 4. Case Tracking \n 5. Register Complaint";
+                $message_string="Welcome to ACC. Choose an option:\n 1. Report corruption \n 2. Corruption Awareness \n 3. Request call back \n 4. Register Complaint";
                 $request_type = "2";
                 //update the session record
                 $update_session = USSDSession::where('session_id', $session_id)->update([
@@ -84,7 +83,7 @@ class USSDSessionController extends Controller
                                         'message' => 'The prompt for corruption awareness has been sent successfully'
                                     ]);
                                     $save_inquiry->save();
-                                    $formatted_message="Hi, Don't mind the name this is Emmanuel zitha messing with you from work. Hope you good. You should call to comfirm that it worked. otherwise inchito nashikaba";
+                                    $formatted_message="Hi, to find out more about corruption please visit our website: https://www.acc.gov.zm/about-corruption/ or call us on our toll-line 5980";
                                     $url_encoded_message = urlencode($formatted_message);
         
                                     $sendSMS = Http::withoutVerifying()
@@ -95,7 +94,7 @@ class USSDSessionController extends Controller
                             }elseif ($last_part ==3){
                                 $save_inquiry=UssdInbox::create([
                                     'phone_number' => $phone,
-                                    'message' => 'Prompt for requesting a call back'
+                                    'message' => 'Prompt for requesting a call back has been sent successfully'
                                 ]);
                                 $save_inquiry->save();
                                 $formatted_message="Your request has been sent successfully, you will receive a call soon. Additionally, you can contact us using the following: \n Toll-free line 5980, \n Email info@acc.gov.zm, \n Direct mail/letter P.O Box 50486, Lusaka or\n Visit any one of the ACC offices";
@@ -106,14 +105,6 @@ class USSDSessionController extends Controller
                                 $message_string="A request for call back has been sent successfully";
                                 $request_type = "3";
                             }elseif ($last_part ==4){
-                                $message_string="Please enter your case number:  \n \n 0 for previous menu. ";
-                                $request_type = "2";
-                                //update the session record
-                                $update_session = USSDSession::where('session_id', $session_id)->update([
-                                    "case_no" => 3,
-                                    "step_no" => 1
-                                ]);
-                            }elseif ($last_part ==5){
                                 $message_string="Select the category of your complaint \n1. Did not receive call back. \n2. Case has not been followed up. \n \n 0 for previous menu.";
                                 $request_type = "2";
                                 //update the session record
@@ -161,25 +152,24 @@ class USSDSessionController extends Controller
                         }
                     }elseif ($case_no ==2 && $step_no ==2 && !empty($last_part) && is_numeric($last_part)){
                         if($last_part ==1){
-                            //save into the ussd inbox table
-                            $message_string="Enter the name of the corrupt individual. \n \n 0 for previous menu.";
-                            $request_type = "2";
-                            //save name of individual
-                            $corrupt_individual=CorruptIndividual::create([
-                                'name' => $name
+                            $save_inquiry=UssdInbox::create([
+                                'phone_number' => $phone,
+                                'message' => 'Prompt for requesting a reporting has been sent succesfully'
                             ]);
-                            $corrupt_individual=CorruptIndividual::save();
-                            //update the session record
-                            $update_session = USSDSession::where('session_id', $session_id)->update([
-                                "case_no" => 5,
-                                "step_no" => 1
-                            ]);
+                            $save_inquiry->save();
+                            $formatted_message="Your request has been sent successfully, you will receive a call soon to ascertain the details of your report. Additionally, you can contact us using using our toll-free line 5980 or visit the nearest ACC office to you.";
+                            $url_encoded_message = urlencode($formatted_message);
+
+                            $sendSMS = Http::withoutVerifying()
+                                ->post('http://www.cloudservicezm.com/smsservice/httpapi?username=school&password=school&msg=' . $url_encoded_message . '.+&shortcode=2343&sender_id=Ontech&phone=' . $phone . '&api_key=121231313213123123');
+                            $message_string="A request for reporting has been sent successfully";
+                            $request_type = "3";
 
                         }
                     }
                     break;
                 case '3': //Register Complaint
-                    if($case_no == 2 && $step_no == 1 && !empty($last_part)){
+                    if($case_no == 3 && $step_no == 1 && !empty($last_part)){
                         if($last_part){
                            //save into the ussd inbox table
                            $save_inquiry=UssdInbox::create([
@@ -187,7 +177,7 @@ class USSDSessionController extends Controller
                             'message' => 'Case tracking feedback'
                         ]);
                         $save_inquiry->save();
-                        $formatted_message="Hi, we have received your simcard deactivation inquiry. Our team will get back to you soon ";
+                        $formatted_message="Hi, we have received your case tracking inquiry. Our team will get back to you soon";
                         $url_encoded_message = urlencode($formatted_message);
 
                         $sendSMS = Http::withoutVerifying()

@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class UssdInbox extends Model
 {
     use HasFactory;
-    Protected $fillable = ['phone_number'];
+    Protected $fillable = ['phone_number', 'corrupt_individual'];
 }

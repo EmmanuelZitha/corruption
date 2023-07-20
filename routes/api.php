@@ -17,5 +17,5 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::post('/ussd', [App\Http\Controllers\USSDSessionController::class, 'acc']);
+Route::post('/ussd',[App\Http\Controllers\USSDSessionController::class,'acc']);
 Route::post('/store',[App\Http\Controllers\CorruptIndividualController::class,'store']);
