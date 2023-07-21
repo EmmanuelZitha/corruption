@@ -245,35 +245,6 @@ class USSDSessionController extends Controller
                         ]);
                     }
                 }
-                    break;
-                    case '5': //Inquiries
-                        if($case_no == 5 && $step_no == 1 && !empty($last_part)){
-                            if($last_part==$corrupt_individual){
-                                $message_string="From which organisation does the individual belong? \n \n 0 for previous menu.";
-                                $request_type = "2";
-                                //update the session record
-                                $update_session = USSDSession::where('session_id', $session_id)->update([
-                                    "case_no" => 5,
-                                    "step_no" => 2
-                                ]);
-                            }
-                        }elseif ($case_no ==5 && $step_no ==2 && !empty($last_part)){
-                            if($last_part ==1){
-                                //save into the ussd inbox table
-                           $save_inquiry=UssdInbox::create([
-                            'phone_number' => $phone,
-                            'message' => 'Response to complaint 1'
-                        ]);
-                        $save_inquiry->save();
-                        $formatted_message="We are sorry for the inconvinience, we will get back to you as soon as possible";
-                        $url_encoded_message = urlencode($formatted_message);
-
-                        $sendSMS = Http::withoutVerifying()
-                            ->post('http://www.cloudservicezm.com/smsservice/httpapi?username=school&password=school&msg=' . $url_encoded_message . '.+&shortcode=2343&sender_id=Ontech&phone=' . $phone . '&api_key=121231313213123123');
-                        $message_string="Prompt for the second complaint has been sent successfully.";
-                        $request_type = "3";
-                            }
-                        }
             }
             //request response
             $response = array(
