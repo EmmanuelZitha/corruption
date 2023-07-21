@@ -69,7 +69,7 @@ class USSDSessionController extends Controller
                 case '1': //welcome
                         if($case_no == 1 && $step_no == 2 && !empty($last_part) && is_numeric($last_part)){
                             if($last_part==1){
-                                $message_string="Please select the form of corruption:\n 1. Bribery and Extortion \n 2. Fraud and Misuse of Public Resources \n 3. Embezzlement and Money Laundering \n 4. Other Forms of Corruption \n 0 for previous menu.";
+                                $message_string="Please select the form of corruption:\n 1. Bribery and Extortion \n 2. Fraud and Misuse of Public Resources \n 3. Embezzlement and Money Laundering \n 4. Other Forms of Corruption \n 0. for previous menu.";
                                 $request_type = "2";
                                 //update the session record
                                 $update_session = USSDSession::where('session_id', $session_id)->update([
@@ -118,39 +118,52 @@ class USSDSessionController extends Controller
                 case '2': //Inquiries
                     if($case_no == 2 && $step_no == 1 && !empty($last_part) && is_numeric($last_part)){
                         if($last_part==1){
-                            $message_string="Do you wish to be anonymous \n1. Yes. \n2. No. \n \n 0 for previous menu.";
+                            $message_string="Do you wish to be anonymous \n1. Yes. \n2. No. \n0. for previous menu.";
                             $request_type = "2";
                             //update the session record
                             $update_session = USSDSession::where('session_id', $session_id)->update([
-                                "case_no" => 2,
-                                "step_no" => 2
+                                "case_no" => 3,
+                                "step_no" => 1
                             ]);
                         }elseif ($last_part ==2){
-                            $message_string="Do you wish to be anonymous \n1. Yes. \n2. No. \n \n 0 for previous menu.";
+                            $message_string="Do you wish to be anonymous \n1. Yes. \n2. No. \n0. for previous menu.";
                             $request_type = "2";
                             //update the session record
                             $update_session = USSDSession::where('session_id', $session_id)->update([
-                                "case_no" => 2,
-                                "step_no" => 2
+                                "case_no" => 3,
+                                "step_no" => 1
                             ]);
                         }elseif ($last_part ==3){
-                            $message_string="Do you wish to be anonymous \n1. Yes. \n2. No. \n \n 0 for previous menu.";
+                            $message_string="Do you wish to be anonymous \n1. Yes. \n2. No. \n0. for previous menu.";
                             $request_type = "2";
                             //update the session record
                             $update_session = USSDSession::where('session_id', $session_id)->update([
-                                "case_no" => 2,
-                                "step_no" => 2
+                                "case_no" => 3,
+                                "step_no" => 1
                             ]);
-                        }elseif ($last_part ==3){
-                            $message_string="Do you wish to be anonymous \n1. Yes. \n2. No. \n \n 0 for previous menu.";
+                        }elseif ($last_part ==4){
+                            $message_string="Do you wish to be anonymous \n1. Yes. \n2. No. \n0. for previous menu.";
                             $request_type = "2";
                             //update the session record
                             $update_session = USSDSession::where('session_id', $session_id)->update([
-                                "case_no" => 2,
+                                "case_no" => 3,
+                                "step_no" => 1
+                            ]);
+                        }
+                    }elseif ($case_no ==2 && $step_no ==1 && $last_part==0 && is_numeric($last_part)){
+                        if($last_part ==0){
+                            $message_string="Welcome to ACC. Choose an option:\n 1. Report corruption \n 2. Corruption Awareness \n 3. Request call back \n 4. Register Complaint";
+                            $request_type = "2";
+                            //update the session record
+                            $update_session = USSDSession::where('session_id', $session_id)->update([
+                                "case_no" => 1,
                                 "step_no" => 2
                             ]);
                         }
-                    }elseif ($case_no ==2 && $step_no ==2 && !empty($last_part) && is_numeric($last_part)){
+                    }
+                    break;
+                case '3': //Register Complaint
+                    if ($case_no ==3 && $step_no ==1 && !empty($last_part) && is_numeric($last_part)){
                         if($last_part ==1){
                             $save_inquiry=UssdInbox::create([
                                 'phone_number' => $phone,
@@ -164,26 +177,29 @@ class USSDSessionController extends Controller
                                 ->post('http://www.cloudservicezm.com/smsservice/httpapi?username=school&password=school&msg=' . $url_encoded_message . '.+&shortcode=2343&sender_id=Ontech&phone=' . $phone . '&api_key=121231313213123123');
                             $message_string="A request for reporting has been sent successfully";
                             $request_type = "3";
+                        }elseif($last_part ==2){
+                            $save_inquiry=UssdInbox::create([
+                                'phone_number' => $phone,
+                                'message' => 'Prompt for requesting a reporting has been sent succesfully'
+                            ]);
+                            $save_inquiry->save();
+                            $formatted_message="Your request has been sent successfully, you will receive a call soon to ascertain the details of your report. Additionally, you can contact us using using our toll-free line 5980 or visit the nearest ACC office to you.";
+                            $url_encoded_message = urlencode($formatted_message);
 
+                            $sendSMS = Http::withoutVerifying()
+                                ->post('http://www.cloudservicezm.com/smsservice/httpapi?username=school&password=school&msg=' . $url_encoded_message . '.+&shortcode=2343&sender_id=Ontech&phone=' . $phone . '&api_key=121231313213123123');
+                            $message_string="A request for reporting has been sent successfully";
+                            $request_type = "3";
                         }
-                    }
-                    break;
-                case '3': //Register Complaint
-                    if($case_no == 3 && $step_no == 1 && !empty($last_part)){
-                        if($last_part){
-                           //save into the ussd inbox table
-                           $save_inquiry=UssdInbox::create([
-                            'phone_number' => $phone,
-                            'message' => 'Case tracking feedback'
-                        ]);
-                        $save_inquiry->save();
-                        $formatted_message="Hi, we have received your case tracking inquiry. Our team will get back to you soon";
-                        $url_encoded_message = urlencode($formatted_message);
-
-                        $sendSMS = Http::withoutVerifying()
-                            ->post('http://www.cloudservicezm.com/smsservice/httpapi?username=school&password=school&msg=' . $url_encoded_message . '.+&shortcode=2343&sender_id=Ontech&phone=' . $phone . '&api_key=121231313213123123');
-                        $message_string="The prompt for the case tracking feedback has been sent successfully.";
-                        $request_type = "3";
+                    }elseif ($case_no ==3 && $step_no ==1 && $last_part ==0 && is_numeric($last_part)){
+                        if($last_part ==0){
+                            $message_string="Please select the form of corruption:\n 1. Bribery and Extortion \n 2. Fraud and Misuse of Public Resources \n 3. Embezzlement and Money Laundering \n 4. Other Forms of Corruption \n 0. for previous menu.";
+                                $request_type = "2";
+                                //update the session record
+                                $update_session = USSDSession::where('session_id', $session_id)->update([
+                                    "case_no" => 2,
+                                    "step_no" => 1
+                                ]);
                         }
                     }
                     break;
@@ -218,7 +234,17 @@ class USSDSessionController extends Controller
                         $message_string="Prompt for the second complain has been sent successfully.";
                         $request_type = "3";
                         }
+                }elseif ($case_no == 4 && $step_no == 1 && $last_part==0 && is_numeric($last_part)){
+                    if($last_part ==0){
+                        $message_string="Welcome to ACC. Choose an option:\n 1. Report corruption \n 2. Corruption Awareness \n 3. Request call back \n 4. Register Complaint";
+                        $request_type = "2";
+                        //update the session record
+                        $update_session = USSDSession::where('session_id', $session_id)->update([
+                            "case_no" => 1,
+                            "step_no" => 2
+                        ]);
                     }
+                }
                     break;
                     case '5': //Inquiries
                         if($case_no == 5 && $step_no == 1 && !empty($last_part)){
